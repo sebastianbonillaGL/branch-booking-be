@@ -3,12 +3,13 @@ const passport = require('passport');
 const localStrategy = require('passport-local').Strategy
 const Oauth2Client = require('google-auth-library').OAuth2Client
 const client = new Oauth2Client(config.google.clientID);
+const jwtStrategy = require('passport-jwt').Strategy;
+const { ExtractJwt } = require('passport-jwt');
 
 
 passport.use('login', new localStrategy({
     passwordField: 'idToken'
 }, function (username, password, done) {
-    console.log(password);
     verifyToken(password)
         .then(function (user) {
             return done(null, user);
@@ -16,6 +17,13 @@ passport.use('login', new localStrategy({
         .catch(function (error) {
             return done(error);
         });
+}));
+
+passport.use(new jwtStrategy({
+    secretOrKey: config.secrets.jwt,
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+}, function (token, done) {
+    done(null, token.user);
 }));
 
 let verifyToken = function (token) {
