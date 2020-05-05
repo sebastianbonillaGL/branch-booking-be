@@ -1,18 +1,6 @@
-let express = require('express');
-let bodyParser = require('body-parser');
-let mongoose = require('mongoose');
+const config = require('./app/config/config');
+const app = require('./app/app');
 
-mongoose.connect('mongodb://localhost/branch-booking');
-
-
-let app = express();
-
-app.use(express.static('public'));
-app.use(bodyParser.json());
-app.use('/api/v1', require('./routes/apiRouter'));
-app.use((error, request, response, next) => {
-    console.log(error);
-    response.status(422).send({error: error.message});
-})
-
-app.listen(process.env.port || 3000);
+app.listen(config.port, function(){
+    console.log("listening on port: " + config.port);
+});
