@@ -6,7 +6,7 @@ const config = require('./config/config');
 require('./api/auth/passportSetup');
 
 mongoose.connect(
-    config.dbUrl,
+    config.MONGODB_URI,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,
