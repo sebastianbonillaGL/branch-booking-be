@@ -5,6 +5,7 @@ const config = require('./config/config');
 
 require('./api/auth/passportSetup');
 
+console.log(config.MONGODB_URI);
 mongoose.connect(
     config.MONGODB_URI,
     {
@@ -13,7 +14,6 @@ mongoose.connect(
         useCreateIndex: true
     }
 );
-// mongoose.connect('mongodb+srv://bonsebas:l31dyJ*.@branch-booking-1prnm.mongodb.net/test?retryWrites=true&w=majority', {useNewUrlParser: true});
 
 let app = express();
 require('./middleware/appMiddleware')(app);
