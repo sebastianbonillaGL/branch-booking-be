@@ -1,22 +1,58 @@
 const Branch = require('./branch');
+const lodash = require('lodash');
 
-exports.get = function(request, response, next) {
+exports.checkBranch = function () {
+    return function (req, res, next) {
+        let id = req.query.id;
+        Branch.findById(id)
+            .then(function (branch) {
+                if (!branch) {
+                    next(Error('No branch with that id'));
+                } else {
+                    req.branch = branch;
+                    next();
+                }
+            })
+            .catch(next)
+    }
+}
+
+exports.get = function (request, response, next) {
     Branch.find()
-    .populate('neighbors')
-    .exec()
-    .then((data) => {
-        response.json(data);
-    })
-    .catch(next);
+        .populate('neighbors')
+        .exec()
+        .then((data) => {
+            response.json(data);
+        })
+        .catch(next);
 }
 
 exports.post = function (request, response, next) {
     Branch.create(request.body)
-        .then(updateNeighbors)
-        .then(function (result) {
-            response.json(result);
+        .then(function(branch){
+            updateNeighbors(branch)
+            .then(function(_){
+                response.json(branch);
+            })
         })
         .catch(next);
+}
+
+exports.put = function (request, response, next) {
+    let branch = request.branch;
+    let update = request.body;
+    lodash.merge(branch, update);
+
+    branch.save(function (err, saved) {
+        if (err) {
+            next(err);
+        } else {
+            updateNeighbors(update)
+            .then(function(_){
+                response.json(saved);
+            })
+        }
+    });
 }
 
 let updateNeighbors = (branch) => {

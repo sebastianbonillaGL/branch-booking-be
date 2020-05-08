@@ -5,7 +5,6 @@ const config = require('./config/config');
 
 require('./api/auth/passportSetup');
 
-console.log(config.MONGODB_URI);
 mongoose.connect(
     config.MONGODB_URI,
     {
