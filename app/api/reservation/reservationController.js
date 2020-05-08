@@ -1,3 +1,4 @@
+const lodash = require('lodash');
 const Reservation = require('./reservation');
 
 exports.checkReservationByDate = function () {
@@ -35,7 +36,12 @@ exports.checkReservation = function () {
 }
 
 exports.get = function (req, res, next) {
-    Reservation.find({ user: req.user._id })
+    let date = req.query.date;
+    let query = { user: req.user._id }
+    if (date) {
+        query.date = date
+    }
+    Reservation.find(query)
         .populate('branch user')
         .exec()
         .then(function (reservations) {
@@ -62,4 +68,20 @@ exports.delete = function (req, res, next) {
             res.json(removed);
         }
     });
+}
+
+exports.put = function(req, res, next) {
+    let reservation = request.reservation;
+    var update = request.body;
+    
+    lodash.merge(reservation, update);
+
+    reservation.save(function(err, saved){
+        if (err) {
+            next(err);
+        }else{
+            res.json(saved);
+        }
+    })
+    
 }
