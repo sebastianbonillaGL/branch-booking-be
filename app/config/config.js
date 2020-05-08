@@ -4,7 +4,7 @@ var config = {
   dev: 'development',
   prod: 'production',
   port: process.env.PORT || 3000,
-  expireTime: 24 * 60 * 10,
+  expireTime: "7d",
   secrets: {
     jwt: process.env.JWT || 'gumball'
   }
