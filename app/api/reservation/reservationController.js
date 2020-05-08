@@ -37,10 +37,17 @@ exports.checkReservation = function () {
 
 exports.get = function (req, res, next) {
     let date = req.query.date;
+    let reservationDate = req.query.reservationDate;
     let query = { user: req.user._id }
-    if (date) {
+
+    if (reservationDate) {
         query.date = date
     }
+
+    if (date) {
+        query.date = { "$gte" : date }
+    }
+
     Reservation.find(query)
         .populate('branch user')
         .exec()
