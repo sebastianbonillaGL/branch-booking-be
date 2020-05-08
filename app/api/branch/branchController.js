@@ -1,4 +1,5 @@
 const Branch = require('./branch');
+const Reservation = require('./../reservation/reservation');
 const lodash = require('lodash');
 
 exports.checkBranch = function () {
@@ -18,23 +19,35 @@ exports.checkBranch = function () {
 }
 
 exports.get = function (request, response, next) {
-    Branch.find()
-        .populate('neighbors')
-        .exec()
-        .then((data) => {
-            response.json(data);
-        })
+    let date = new Date(request.query.date);
+    Branch.aggregate([
+        {
+            "$lookup": {
+                "from": "reservations",
+                "localField": "_id",
+                "foreignField": "branch",
+                "as": "reservations"
+            }
+        },
+        { 
+            "$match": { 
+                "reservations.date": { "$not": { "$eq": date } } 
+            } 
+        }
+    ]).then(function (results) {
+        response.json(results);
+    })
         .catch(next);
 }
 
 exports.post = function (request, response, next) {
     console.log(request.body);
     Branch.create(request.body)
-        .then(function(branch){
+        .then(function (branch) {
             updateNeighbors(branch)
-            .then(function(_){
-                response.json(branch);
-            })
+                .then(function (_) {
+                    response.json(branch);
+                })
         })
         .catch(next);
 }
@@ -43,8 +56,8 @@ exports.put = function (request, response, next) {
     let branch = request.branch;
     var update = request.body;
 
-    lodash.mergeWith(branch, update, function(obj, src){
-        if(lodash.isArray(obj)){
+    lodash.mergeWith(branch, update, function (obj, src) {
+        if (lodash.isArray(obj)) {
             return src;
         }
     });
@@ -54,9 +67,9 @@ exports.put = function (request, response, next) {
             next(err);
         } else {
             updateNeighbors(saved)
-            .then(function(_){
-                response.json(saved);
-            })
+                .then(function (_) {
+                    response.json(saved);
+                })
         }
     });
 }
