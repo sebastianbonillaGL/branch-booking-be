@@ -38,7 +38,7 @@ let verifyToken = function (username, token) {
     return new Promise(function (resolve, reject) {
         client.verifyIdToken({
             idToken: token,
-            audience: config.google.clientID
+            audience: config.clientID
         }).then((ticket) => {
             let payload = ticket.getPayload();
             if (payload.hd === "gorillalogic.com") {
