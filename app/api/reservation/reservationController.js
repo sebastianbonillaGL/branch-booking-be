@@ -8,14 +8,14 @@ exports.checkReservationByDate = function () {
             date: reservation.date,
             branch: reservation.branch
         })
-        .then(function(reservation){
-            if(!reservation){
-                next()
-            } else {
-                next(Error('Already exists a reservation for this branch on this date'));
-            }
-        })
-        .catch(next);
+            .then(function (reservation) {
+                if (!reservation) {
+                    next()
+                } else {
+                    next(Error('Already exists a reservation for this branch on this date'));
+                }
+            })
+            .catch(next);
     }
 }
 
@@ -45,9 +45,9 @@ exports.get = function (req, res, next) {
     }
 
     if (date) {
-        query.date = { "$gte" : date }
+        query.date = { "$gte": date }
     }
-    
+
     Reservation.find(query)
         .populate('branch user')
         .exec()
@@ -62,7 +62,14 @@ exports.post = function (req, res, next) {
     reservation.user = req.user._id;
     reservation.save()
         .then(function (newReservation) {
-            res.json(newReservation);
+            newReservation
+                .populate('user')
+                .populate('branch')
+                .execPopulate()
+                .then(function (populated) {
+                    res.json(populated);
+                })
+                .catch(next)
         })
         .catch(next)
 }
@@ -77,18 +84,18 @@ exports.delete = function (req, res, next) {
     });
 }
 
-exports.put = function(req, res, next) {
+exports.put = function (req, res, next) {
     let reservation = request.reservation;
     var update = request.body;
-    
+
     lodash.merge(reservation, update);
 
-    reservation.save(function(err, saved){
+    reservation.save(function (err, saved) {
         if (err) {
             next(err);
-        }else{
+        } else {
             res.json(saved);
         }
     })
-    
+
 }
