@@ -28,6 +28,7 @@ exports.get = function (request, response, next) {
 }
 
 exports.post = function (request, response, next) {
+    console.log(request.body);
     Branch.create(request.body)
         .then(function(branch){
             updateNeighbors(branch)
@@ -40,8 +41,13 @@ exports.post = function (request, response, next) {
 
 exports.put = function (request, response, next) {
     let branch = request.branch;
-    let update = request.body;
-    lodash.merge(branch, update);
+    var update = request.body;
+
+    lodash.mergeWith(branch, update, function(obj, src){
+        if(lodash.isArray(obj)){
+            return src;
+        }
+    });
 
     branch.save(function (err, saved) {
         if (err) {
