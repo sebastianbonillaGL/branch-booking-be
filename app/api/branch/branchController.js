@@ -53,7 +53,7 @@ exports.put = function (request, response, next) {
         if (err) {
             next(err);
         } else {
-            updateNeighbors(update)
+            updateNeighbors(saved)
             .then(function(_){
                 response.json(saved);
             })

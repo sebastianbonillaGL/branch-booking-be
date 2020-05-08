@@ -4,10 +4,12 @@ const Schema = mongoose.Schema;
 let ReservationSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
+        ref: 'user',
         required: true
     },
     branch: {
         type: Schema.Types.ObjectId,
+        ref: 'branch',
         required: true
     },
     used: {

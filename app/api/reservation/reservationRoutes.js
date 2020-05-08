@@ -7,7 +7,7 @@ router.use(passport.authenticate('jwt', { session: false }));
 
 router.route('/')
     .get(controller.get)
-    .post(controller.post)
+    .post(controller.checkReservationByDate(), controller.post)
     .delete(controller.checkReservation(), controller.delete)
 
 module.exports = router;

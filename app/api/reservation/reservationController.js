@@ -1,5 +1,23 @@
 const Reservation = require('./reservation');
 
+exports.checkReservationByDate = function () {
+    return function (req, res, next) {
+        let reservation = new Reservation(req.body);
+        Reservation.findOne({
+            date: reservation.date,
+            branch: reservation.branch
+        })
+        .then(function(reservation){
+            if(!reservation){
+                next()
+            } else {
+                next(Error('Already exists a reservation for this branch on this date'));
+            }
+        })
+        .catch(next);
+    }
+}
+
 exports.checkReservation = function () {
     return function (req, res, next) {
         let reservationId = req.query.id;
@@ -17,7 +35,7 @@ exports.checkReservation = function () {
 }
 
 exports.get = function (req, res, next) {
-    Reservation.find({ user: req._id })
+    Reservation.find({ user: req.user._id })
         .populate('branch user')
         .exec()
         .then(function (reservations) {
